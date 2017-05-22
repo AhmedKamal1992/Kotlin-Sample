@@ -2,7 +2,7 @@
 
 #### This sample app uses MVP + RXJava + Retrofit + OKHttp + Fresco + Dagger2 + Kotlin + ButterKnife
 
-#Thanks to the open source project
+# Thanks to the open source project
 - [Kotlin](https://github.com/JetBrains/kotlin)
 - [RxJava](https://github.com/ReactiveX/RxJava)
 - [Retrofit](https://github.com/square/retrofit)
