@@ -6,9 +6,14 @@ import com.dev.ldhnam.kotlinsample.mvp.model.User
 
 interface MainContract {
     interface View: BaseView {
-        fun showUsers(users: List<User>)
+        fun addUser(user: User)
+        fun addAllUser(users: List<User>)
+        fun setUsers(users: ArrayList<User>)
+        fun updateUserAt(index: Int, user: User)
     }
     interface Presenter: BasePresenter<View> {
         fun getUsers()
+        fun getUser()
+        fun updateUser()
     }
 }

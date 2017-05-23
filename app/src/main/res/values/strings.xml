@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">Kotlin Sample</string>
+    <string name="add_single_item">Add single item</string>
+    <string name="add_multiple_items">Add multiple items</string>
+    <string name="update_single_item">Update single item</string>
+    <string name="set_multiple_items">Set multiple items</string>
+    <string name="remove_single_item">Remove single item</string>
+    <string name="clear_all_items">Clear all items</string>
 </resources>

@@ -9,19 +9,20 @@ import android.widget.TextView
 import butterknife.BindView
 import butterknife.ButterKnife
 import com.dev.ldhnam.kotlinsample.R
+import com.dev.ldhnam.kotlinsample.RxRecyclerViewAdapterCallback
+import com.dev.ldhnam.kotlinsample.RxSortedDiffList
 import com.dev.ldhnam.kotlinsample.mvp.model.User
 import com.facebook.drawee.view.SimpleDraweeView
 
-class UserAdapter: RecyclerView.Adapter<UserAdapter.ViewHolder>() {
+class UserAdapter : RecyclerView.Adapter<UserAdapter.ViewHolder>() {
 
-    private var users: List<User> = ArrayList()
+    private var users: RxSortedDiffList<User>
 
-    fun setUsers(users: List<User>) {
-        this.users = users
-        notifyDataSetChanged()
+    fun getRxSortedDiffList(): RxSortedDiffList<User> = users
+
+    override fun getItemCount(): Int {
+        return users.size()
     }
-
-    override fun getItemCount(): Int = users.size
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         bindView(holder, position)
@@ -33,7 +34,7 @@ class UserAdapter: RecyclerView.Adapter<UserAdapter.ViewHolder>() {
     }
 
     private fun bindView(holder: ViewHolder, position: Int) {
-        val user = users[position]
+        val user = users.get(position)
         holder.tvName.text = user.name
         holder.tvDesc.text = user.getDesc()
         holder.avatar.setImageURI(Uri.parse(user.photo))
@@ -48,5 +49,22 @@ class UserAdapter: RecyclerView.Adapter<UserAdapter.ViewHolder>() {
             ButterKnife.bind(this, itemView)
         }
 
+    }
+
+    init {
+        users = RxSortedDiffList(User::class.java, object : RxRecyclerViewAdapterCallback<User>(this) {
+
+            override fun areContentsTheSame(oldItem: User, newItem: User): Boolean {
+                return User.areContentsTheSame(oldItem, newItem)
+            }
+
+            override fun areItemsTheSame(item1: User, item2: User): Boolean {
+                return User.areItemsTheSame(item1, item2)
+            }
+
+            override fun compare(o1: User, o2: User): Int {
+                return User.compare(o1, o2)
+            }
+        })
     }
 }
