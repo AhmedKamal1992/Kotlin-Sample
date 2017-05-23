@@ -16,20 +16,24 @@ import com.dev.ldhnam.kotlinsample.ui.adapter.UserAdapter
 import javax.inject.Inject
 
 class MainActivity : BaseActivity(), MainContract.View {
+    override fun removeUserAt(index: Int) {
+        userAdapter.rxSortedList.removeItemAt(index)
+    }
+
     override fun setUsers(users: ArrayList<User>) {
-        userAdapter.getRxSortedDiffList().set(users)
+        userAdapter.rxSortedList.addAll(users)
     }
 
     override fun updateUserAt(index: Int, user: User) {
-        userAdapter.getRxSortedDiffList().updateItemAt(1, user)
+        userAdapter.rxSortedList.updateItemAt(1, user)
     }
 
     override fun addUser(user: User) {
-        userAdapter.getRxSortedDiffList().add(user)
+        userAdapter.rxSortedList.add(user)
     }
 
     override fun addAllUser(users: List<User>) {
-        userAdapter.getRxSortedDiffList().set(users)
+        userAdapter.rxSortedList.addAll(users)
     }
 
     @BindView(R.id.rv_user) lateinit var rvUser: RecyclerView
@@ -53,6 +57,7 @@ class MainActivity : BaseActivity(), MainContract.View {
                 .inject(this)
         userAdapter = UserAdapter()
         rvUser.layoutManager = LinearLayoutManager(this)
+        rvUser.setHasFixedSize(true)
         rvUser.adapter = userAdapter
         mainPresenter.attachView(this)
         mainPresenter.setAdapter(userAdapter)
@@ -70,7 +75,22 @@ class MainActivity : BaseActivity(), MainContract.View {
             R.id.action_set_multiple_items -> {
                 mainPresenter.setMultipleItems()
             }
+            R.id.action_update_single -> {
+                mainPresenter.updateUser()
+            }
+            R.id.action_remove_single -> {
+                mainPresenter.removeSingle()
+            }
+            R.id.action_clear -> {
+                userAdapter.rxSortedList.clear()
+            }
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        userAdapter.rxSortedList.clearSubscribe()
+        mainPresenter.detachView()
     }
 }

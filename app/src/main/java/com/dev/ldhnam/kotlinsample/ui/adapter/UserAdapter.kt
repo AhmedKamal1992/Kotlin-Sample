@@ -16,43 +16,10 @@ import com.facebook.drawee.view.SimpleDraweeView
 
 class UserAdapter : RecyclerView.Adapter<UserAdapter.ViewHolder>() {
 
-    private var users: RxSortedDiffList<User>
-
-    fun getRxSortedDiffList(): RxSortedDiffList<User> = users
-
-    override fun getItemCount(): Int {
-        return users.size()
-    }
-
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        bindView(holder, position)
-    }
-
-    override fun onCreateViewHolder(parent: ViewGroup, p1: Int): ViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.item_user, parent, false)
-        return ViewHolder(view)
-    }
-
-    private fun bindView(holder: ViewHolder, position: Int) {
-        val user = users.get(position)
-        holder.tvName.text = user.name
-        holder.tvDesc.text = user.getDesc()
-        holder.avatar.setImageURI(Uri.parse(user.photo))
-    }
-
-    class ViewHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
-        @BindView(R.id.name) lateinit var tvName: TextView
-        @BindView(R.id.desc) lateinit var tvDesc: TextView
-        @BindView(R.id.avatar) lateinit var avatar: SimpleDraweeView
-
-        init {
-            ButterKnife.bind(this, itemView)
-        }
-
-    }
+    val rxSortedList: RxSortedDiffList<User>
 
     init {
-        users = RxSortedDiffList(User::class.java, object : RxRecyclerViewAdapterCallback<User>(this) {
+        rxSortedList = RxSortedDiffList(User::class.java, object : RxRecyclerViewAdapterCallback<User>(this) {
 
             override fun areContentsTheSame(oldItem: User, newItem: User): Boolean {
                 return User.areContentsTheSame(oldItem, newItem)
@@ -66,5 +33,31 @@ class UserAdapter : RecyclerView.Adapter<UserAdapter.ViewHolder>() {
                 return User.compare(o1, o2)
             }
         })
+    }
+
+    override fun getItemCount(): Int {
+        return rxSortedList.size()
+    }
+
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        val user = rxSortedList.get(position)
+        holder.avatar.setImageURI(Uri.parse(user.photo))
+        holder.desc.text = user.getDesc()
+        holder.name.text = user.name
+    }
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.item_user, parent, false)
+        return ViewHolder(view)
+    }
+
+    class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        @BindView(R.id.name) lateinit var name: TextView
+        @BindView(R.id.desc) lateinit var desc: TextView
+        @BindView(R.id.avatar) lateinit var avatar: SimpleDraweeView
+
+        init {
+            ButterKnife.bind(this, itemView)
+        }
     }
 }

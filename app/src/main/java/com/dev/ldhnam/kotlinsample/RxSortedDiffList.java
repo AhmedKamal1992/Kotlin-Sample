@@ -11,9 +11,12 @@ import java.util.concurrent.Executors;
 import io.reactivex.Observable;
 import io.reactivex.ObservableTransformer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
 
 public class RxSortedDiffList<T> {
+
+    private CompositeDisposable disposable;
 
     private static Executor sExecutor = Executors.newSingleThreadExecutor();
 
@@ -21,28 +24,36 @@ public class RxSortedDiffList<T> {
 
     public RxSortedDiffList(Class<T> clazz, RxSortedListCallback<T> callback) {
         mSnappySortedList = new SnappySortedList<>(clazz, callback);
+        disposable = new CompositeDisposable();
     }
 
     public RxSortedDiffList(Class<T> clazz, RxSortedListCallback<T> callback, int initialCapacity) {
         mSnappySortedList = new SnappySortedList<>(clazz, callback, initialCapacity);
+        disposable = new CompositeDisposable();
     }
 
-    public Observable<Integer> add(T item) {
-        return Observable.fromCallable(() -> mSnappySortedList.add(item)).compose(onBackground());
+    public void add(T item) {
+        disposable.add(Observable.just(item)
+                .subscribeOn(Schedulers.computation())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(i -> mSnappySortedList.add(item), Throwable::printStackTrace));
     }
 
-    public Observable<Object> addAll(List<T> users) {
-        return Observable.fromCallable(() -> {
-            mSnappySortedList.addAll(users);
-            return Event.INSTANCE;
-        }).compose(onBackground());
+    public void addAll(List<T> users) {
+        disposable.add(Observable.just(users)
+                .subscribeOn(Schedulers.from(sExecutor))
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(u -> mSnappySortedList.addAll(u)));
     }
 
-    public Observable<Object> clear() {
-        return Observable.fromCallable(() -> {
-            mSnappySortedList.clear();
-            return Event.INSTANCE;
-        }).compose(onBackground());
+    public void clearSubscribe() {
+        disposable.clear();
+    }
+
+    public void clear() {
+        disposable.add(Observable.create(e -> mSnappySortedList.clear())
+                .subscribeOn(Schedulers.from(sExecutor))
+                .observeOn(AndroidSchedulers.mainThread()).subscribe());
     }
 
     public T get(int index) {
@@ -57,8 +68,11 @@ public class RxSortedDiffList<T> {
         return Observable.fromCallable(() -> mSnappySortedList.remove(item)).compose(onBackground());
     }
 
-    public Observable<T> removeItemAt(int index) {
-        return Observable.fromCallable(() -> mSnappySortedList.removeItemAt(index)).compose(onBackground());
+    public void removeItemAt(int index) {
+        disposable.add(Observable.just(index)
+                .subscribeOn(Schedulers.from(sExecutor))
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(i -> mSnappySortedList.removeItemAt(i)));
     }
 
     public Observable<Object> set(Collection<T> items) {
@@ -75,11 +89,11 @@ public class RxSortedDiffList<T> {
         return mSnappySortedList.size();
     }
 
-    public Observable<Object> updateItemAt(int index, T item) {
-        return Observable.fromCallable(() -> {
-            mSnappySortedList.updateItemAt(index, item);
-            return Event.INSTANCE;
-        }).compose(onBackground());
+    public void updateItemAt(int index, T item) {
+        disposable.add(Observable.just(item)
+                .subscribeOn(Schedulers.from(sExecutor))
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(i -> mSnappySortedList.updateItemAt(index, i)));
     }
 
     private <T2> ObservableTransformer<T2, T2> onBackground() {

@@ -14,7 +14,7 @@ import javax.inject.Inject
 
 class MainPresenter @Inject constructor(private val restService: RestService) : MainContract.Presenter {
     override fun updateUser() {
-        val user: User = adapter!!.getRxSortedDiffList().get(1)
+        val user: User = adapter!!.rxSortedList.get(1)
         val newUser: User = User(user.age, if (user.gender.equals("male", true)) "female" else "male", user.name, user.password, user.phone,
                 user.photo, user.surname)
         view?.updateUserAt(1, newUser)
@@ -25,7 +25,7 @@ class MainPresenter @Inject constructor(private val restService: RestService) : 
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
-                    user ->  view?.addUser(user)
+                    user -> view?.addUser(user)
                 }))
     }
 
@@ -63,8 +63,8 @@ class MainPresenter @Inject constructor(private val restService: RestService) : 
     }
 
     fun setMultipleItems() {
-        val currentUsers: List<User> = adapter!!.getRxSortedDiffList().data
-        val size: Int = adapter!!.getRxSortedDiffList().size()
+        val currentUsers: List<User> = adapter!!.rxSortedList.data
+        val size: Int = adapter!!.rxSortedList.size()
         val newUsers = Utils.copyAndSwapName(currentUsers, size)
         restService.getUsers(DEFAULT_AMOUNT, DEFAULT_REGION)
                 .subscribeOn(Schedulers.io())
@@ -74,6 +74,13 @@ class MainPresenter @Inject constructor(private val restService: RestService) : 
                     newUsers
                 })
                 .subscribe({users -> view?.setUsers(users)})
+    }
+
+    fun removeSingle() {
+        val index = Utils.randomize(adapter!!.itemCount - 1)
+        if (index >= 0 && index < adapter!!.rxSortedList.size()) {
+            view?.removeUserAt(index)
+        }
     }
 
 }

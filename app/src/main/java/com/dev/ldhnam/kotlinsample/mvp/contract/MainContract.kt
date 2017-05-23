@@ -10,6 +10,7 @@ interface MainContract {
         fun addAllUser(users: List<User>)
         fun setUsers(users: ArrayList<User>)
         fun updateUserAt(index: Int, user: User)
+        fun removeUserAt(index: Int)
     }
     interface Presenter: BasePresenter<View> {
         fun getUsers()

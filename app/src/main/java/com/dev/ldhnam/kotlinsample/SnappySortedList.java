@@ -74,7 +74,8 @@ public class SnappySortedList<T> {
         }
     }
 
-    public void addAll(T... items) {
+    @SafeVarargs
+    public final void addAll(T... items) {
         addAll(items, false);
     }
 

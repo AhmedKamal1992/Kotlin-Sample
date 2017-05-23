@@ -20,4 +20,3 @@ abstract class RxRecyclerViewAdapterCallback<T>(private val mAdapter: RecyclerVi
         mAdapter.notifyItemRangeRemoved(position, count)
     }
 }
-

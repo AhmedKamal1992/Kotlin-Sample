@@ -5,7 +5,11 @@ import android.text.TextUtils
 import com.dev.ldhnam.kotlinsample.util.Constant
 
 data class User(val age: Int, val gender: String, val name: String,
-                val password: String, val phone: String, val photo: String, val surname: String) {
+                val password: String, val phone: String, val photo: String, val surname: String): Comparable<User> {
+
+    override fun compareTo(other: User): Int {
+        return User.compare(this, other)
+    }
 
     fun getDesc(): String = "$gender, $age, $phone"
 
