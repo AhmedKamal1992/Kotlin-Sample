@@ -11,3 +11,4 @@
 - [ButterKnife](https://github.com/JakeWharton/butterknife)
 - [Gson](https://github.com/google/gson)
 - [OkHttp](https://github.com/square/okhttp)
+- [FastList](https://github.com/tranngoclam/fast-list)
