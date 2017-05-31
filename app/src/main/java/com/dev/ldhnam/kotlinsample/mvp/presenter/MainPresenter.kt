@@ -4,7 +4,6 @@ import android.util.Log
 import com.dev.ldhnam.kotlinsample.api.RestService
 import com.dev.ldhnam.kotlinsample.mvp.contract.MainContract
 import com.dev.ldhnam.kotlinsample.mvp.model.User
-import com.dev.ldhnam.kotlinsample.ui.adapter.UserAdapter
 import com.dev.ldhnam.kotlinsample.util.Utils
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -14,7 +13,7 @@ import javax.inject.Inject
 
 class MainPresenter @Inject constructor(private val restService: RestService) : MainContract.Presenter {
     override fun updateUser() {
-        val user: User = adapter!!.rxSortedList.get(1)
+        val user: User = user!!
         val newUser: User = User(user.age, if (user.gender.equals("male", true)) "female" else "male", user.name, user.password, user.phone,
                 user.photo, user.surname)
         view?.updateUserAt(1, newUser)
@@ -31,7 +30,10 @@ class MainPresenter @Inject constructor(private val restService: RestService) : 
 
     private var view: MainContract.View? = null
     private var disposables: CompositeDisposable = CompositeDisposable()
-    private var adapter: UserAdapter? = null
+    private var itemCount: Int = 0
+    private var size: Int = 0
+    private var currentUsers: List<User>? = null
+    private var user: User? = null
 
     companion object {
         val DEFAULT_AMOUNT: Int = 10
@@ -39,8 +41,20 @@ class MainPresenter @Inject constructor(private val restService: RestService) : 
 
     }
 
-    fun setAdapter(adapter: UserAdapter) {
-        this.adapter = adapter
+    fun setUser(user: User) {
+        this.user = user
+    }
+
+    fun setCurrentUsers(users: List<User>) {
+        currentUsers = users
+    }
+
+    fun setSize(size: Int) {
+        this.size = size
+    }
+
+    fun setItemCount(itemCount: Int) {
+        this.itemCount = itemCount
     }
 
     override fun getUsers() {
@@ -63,8 +77,8 @@ class MainPresenter @Inject constructor(private val restService: RestService) : 
     }
 
     fun setMultipleItems() {
-        val currentUsers: List<User> = adapter!!.rxSortedList.data
-        val size: Int = adapter!!.rxSortedList.size()
+        val currentUsers: List<User> = currentUsers!!
+        val size: Int = size
         val newUsers = Utils.copyAndSwapName(currentUsers, size)
         restService.getUsers(DEFAULT_AMOUNT, DEFAULT_REGION)
                 .subscribeOn(Schedulers.io())
@@ -77,8 +91,8 @@ class MainPresenter @Inject constructor(private val restService: RestService) : 
     }
 
     fun removeSingle() {
-        val index = Utils.randomize(adapter!!.itemCount - 1)
-        if (index >= 0 && index < adapter!!.rxSortedList.size()) {
+        val index = Utils.randomize(itemCount)
+        if (index in 0..(size - 1)) {
             view?.removeUserAt(index)
         }
     }

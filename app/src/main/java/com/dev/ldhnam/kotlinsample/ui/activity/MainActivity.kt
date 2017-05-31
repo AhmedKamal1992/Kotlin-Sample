@@ -60,7 +60,6 @@ class MainActivity : BaseActivity(), MainContract.View {
         rvUser.setHasFixedSize(true)
         rvUser.adapter = userAdapter
         mainPresenter.attachView(this)
-        mainPresenter.setAdapter(userAdapter)
         mainPresenter.getUsers()
     }
 
@@ -68,9 +67,11 @@ class MainActivity : BaseActivity(), MainContract.View {
         when (item?.itemId) {
             R.id.action_add_single -> {
                 mainPresenter.getUser()
+                mainPresenter.setUser(userAdapter.rxSortedList.get(1))
             }
             R.id.action_add_multiple -> {
                 mainPresenter.getUsers()
+                mainPresenter.setCurrentUsers(userAdapter.rxSortedList.data)
             }
             R.id.action_set_multiple_items -> {
                 mainPresenter.setMultipleItems()
@@ -85,6 +86,8 @@ class MainActivity : BaseActivity(), MainContract.View {
                 userAdapter.rxSortedList.clear()
             }
         }
+        mainPresenter.setItemCount(userAdapter.itemCount)
+        mainPresenter.setSize(userAdapter.rxSortedList.size())
         return super.onOptionsItemSelected(item)
     }
 
