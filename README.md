@@ -1,6 +1,6 @@
 # Kotlin-Sample
 
-#### This sample app uses MVP + RXJava + Retrofit + OKHttp + Fresco + Dagger2 + Kotlin + ButterKnife
+This sample app uses MVP + RXJava + Retrofit + OKHttp + Fresco + Dagger2 + Kotlin + ButterKnife
 
 # Thanks to the open source project
 - [Kotlin](https://github.com/JetBrains/kotlin)
